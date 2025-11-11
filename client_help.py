@@ -3,7 +3,7 @@ Encrypt/decrypt and sign/verify data for client-server communication.
 Intended for use by client before sending data to server, and after receiving data from server.
 """
 
-# krypterar/signerar/dekrypterar/verifierar data med AES-GCM
+# krypterar/dekrypt data med AES-GCM. signering/verifiering med HMAC
 
 # all data ska krypteras av klienten innan den skickas till servern, med en nyckel härledd från ett lösenord och en slumpmässig nonce per kryptering*
 # datan ska även vara signerad med samma nyckel och med fil-id:t, så att servern inte kan byta ut den mot annan slumpmässig data/en annan fil**
@@ -53,7 +53,7 @@ def generate_key_from_password(password: str, salt: bytes, iterations: int = KDF
 def sign_data(hmac_key: bytes, file_id: int, ciphertext: bytes) -> bytes:
     """
     Produce HMAC-SHA256 signature over file_id || ciphertext.
-    file_id encoded as 3 big-endian bytes (matching your server code).
+    file_id encoded as 3 big-endian bytes (matching server code).
     """
     file_id_bytes = file_id.to_bytes(3, "big")
     h = hmac.HMAC(hmac_key, hashes.SHA256(), backend=default_backend())
