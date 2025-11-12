@@ -9,16 +9,16 @@ def handle_client(conn):
             header = conn.recv(4)
             if not header:
                 break
-            op = header[0]      # 1=put, 2=get
             file_id = int.from_bytes(header[1:4], "big")
 
-            if op == 1:
-                size_bytes = conn.recv(4)
-                size = int.from_bytes(size_bytes, "big")
-                data = conn.recv(size)
-                store[file_id] = data
+            if op == 1: # PUT
+                file_id = int.from_bytes(conn.recv(3), "big")
+                size = int.from_bytes(conn.recv(4), "big")
+                blob = recv_all(conn, size)
+                print("SERVER got blob len:", len(blob))
+                store[file_id] = blob
                 conn.sendall(b"OK")
-            elif op == 2:
+            elif op == 2: # GET
                 data = store.get(file_id, None)
                 if data is None:
                     conn.sendall(b"NO")
@@ -27,6 +27,18 @@ def handle_client(conn):
     finally:
         conn.close()
 
+def recv_all(conn, size):
+    """
+    Receive exactly size bytes from conn.
+    (Otherwise it does not always retrieve full blob).
+    """
+    buf = b""
+    while len(buf) < size:
+        chunk = conn.recv(size - len(buf))
+        if not chunk:
+            raise ConnectionError("Connection closed early")
+        buf += chunk
+    return buf
 
 def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
