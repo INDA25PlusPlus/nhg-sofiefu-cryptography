@@ -2,10 +2,6 @@
 # run verify_update right after file update 
 import hashlib
 
-n = 8 # number of file_ids
-root_hash = "" # the only hash saved by the client
-
-
 def compute_hash(data):
     return hashlib.sha256(data).hexdigest()
 
