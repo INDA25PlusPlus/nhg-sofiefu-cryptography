@@ -1,12 +1,13 @@
-# for client to verify that files is correctly updates
-# should be run right after file update 
+# for client: to verify that files is correctly updated
+# run verify_update right after file update 
+import hashlib
 
 n = 8 # number of file_ids
 root_hash = "" # the only hash saved by the client
 
 
-def compute_hash():
-    print("hey")
+def compute_hash(data):
+    return hashlib.sha256(data).hexdigest()
 
 def reconstruct_root_hash(L, R, file_id, depth, path_nodes, leaf_hash):
     if L==R:
@@ -25,13 +26,13 @@ def reconstruct_root_hash(L, R, file_id, depth, path_nodes, leaf_hash):
 def verify_update(file_id, path_nodes, old_root_hash, new_hash): # after update it requests nodes along the path to the root, to verify
 
     # recursively walk down in binary tree to verify old root-hash with complemented path nodes
-    computed_old_root_hash = reconstruct_root_hash(0, n-1, file_id, 0, path_nodes, old_hash)
+    computed_old_root_hash = reconstruct_root_hash(0, n-1, file_id, 0, path_nodes, old_root_hash)
     if (computed_old_root_hash != path_nodes[0]) or (computed_old_root_hash != old_root_hash): # verifies computedroot=claimedroot=realroot
         return False # verification failes
 
     # verify new root hash 
-    computed_new_root_hash = reconstruct_root_hash(0, n-1, file_id, 0, path_nodes, old_hash)
-    if computer_new_root_hash != root_hash:
+    computed_new_root_hash = reconstruct_root_hash(0, n-1, file_id, 0, path_nodes, old_root_hash)
+    if computed_new_root_hash != root_hash:
         return False
 
     return True

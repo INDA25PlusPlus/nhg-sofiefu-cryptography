@@ -1,4 +1,7 @@
 import math
+import hashlib
+# server saves the whole merkle tree whilst client save a constant (root hash)
+# both use this class
 
 class Node:
     # n=number of leaf nodes
@@ -7,7 +10,7 @@ class Node:
     
     def __init__(self, depth, L, R): 
         self.depth = depth
-        self.is_leaf = True if depth==tree_depth else False
+        self.is_leaf = True if depth==Node.tree_depth else False
 
         # [L, R] is interval of leaf-node-indices this node covers
         self.L = L 
@@ -17,11 +20,10 @@ class Node:
         left_child = None 
         right_child = None
 
-    def compute_hash():
-        hash = 1
-        # todo: sha2 - recommended by wikipedia for merkle trees
+    def compute_hash(data):
+        hashlib.sha256(data).hexdigest()
 
-    def update_leaf(file_id, new_hash, path_nodes): # leaf nodes are files
+    def update_leaf(self, file_id, new_hash, path_nodes): # leaf nodes are files
         if self.is_leaf:
             self.hash = new_hash
             return
@@ -42,9 +44,6 @@ class Node:
         
         self.hash = self.compute_hash(self.left_child.hash + self.right_child.hash)
 
-
-
-    
 
 
 # root = Node(depth=0, L=0, R=7)     
