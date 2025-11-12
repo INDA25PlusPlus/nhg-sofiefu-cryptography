@@ -39,6 +39,7 @@ if __name__ == "__main__":
 
     c = Client()
     
+    print("Putting data...")
     c.put(password, 1, message)
     returned_message = c.get(1)
     if returned_message == message:
