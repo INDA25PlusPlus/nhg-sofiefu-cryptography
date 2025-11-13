@@ -15,11 +15,11 @@ class Client:
         Sends encrypted and signed data to server. Returns True on success.
         """
         # get old file to verify update
-        old_file = self.get(password, file_id)
-        if old_file == None:
+        old_plain, old_raw_blob = self.get(password, file_id)
+        if old_raw_blob is None:
             encrypted_old_file = b""
         else:
-            encrypted_old_file = client_help.encrypt_data(password, file_id, old_file)
+            encrypted_old_file = old_raw_blob
         print("ENCRYPTED OLD FILE", encrypted_old_file, len(encrypted_old_file))
 
         # update file
@@ -48,15 +48,16 @@ class Client:
         Retrieves encrypted data from server by file_id.
         Returns decrypted data bytes on success, or None if not found.
         """
-        header = bytes([2]) + file_id.to_bytes(3, "big")    #1=put, 2=get
+        header = bytes([2]) + file_id.to_bytes(3, "big")
         self.s.sendall(header)
         resp = self.s.recv(2)
         if resp != b"OK":
-            return None
+            return None, None
         size = int.from_bytes(self.s.recv(4), "big")
         blob = self.s.recv(size)
-        print("GET blob len:", len(blob))
-        return client_help.decrypt_data(password, file_id, blob)
+        # decrypt for caller, but also return raw blob
+        plaintext = client_help.decrypt_data(password, file_id, blob)
+        return plaintext, blob
 
 # file id can be 0-7 bc of merkle conditions (rn)
 if __name__ == "__main__":
