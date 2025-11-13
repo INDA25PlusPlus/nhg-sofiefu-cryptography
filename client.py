@@ -24,7 +24,7 @@ class Client:
         path_hashes = [return_message[i:i+32] for i in range(0, len(return_message), 32)] # consists of bytes
 
         old_file = self.get(file_id)
-        new_hash = verify_update(file_id, path_hashes, self.root_hash, old_file, data, self.n) 
+        new_hash = verify_update(file_id, path_hashes, self.root_hash, old_file, encrypted_payload, self.n) 
         if new_hash == False:
             print("error")
             return False
