@@ -1,6 +1,6 @@
 import socket
 import client_help
-from verify_update import verify_update
+from verify_update import verify_update, compute_hash
 
 class Client:
 
@@ -8,7 +8,7 @@ class Client:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((host, port))
         self.n = 8 # number of file_ids
-        self.root_hash = "" # the only hash saved by the client
+        self.root_hash = b"" # the only hash saved by the client
 
     def put(self, password, file_id, data: bytes):
         """
@@ -17,17 +17,26 @@ class Client:
         header = bytes([1]) + file_id.to_bytes(3, "big")  # 1=put, 2=get
         encrypted_payload = client_help.encrypt_data(password, file_id, data)
 
+        # get old file to verify update
+        old_file = self.get(password, file_id)
+        if old_file == None:
+            encrypted_old_file = b""
+        else:
+            encrypted_old_file = client_help.encrypt_data(password, file_id, old_file)
+        print("encypted_old_file", encrypted_old_file, len(encrypted_old_file))
+
+        # send file to server to update 
         self.s.sendall(header + len(encrypted_payload).to_bytes(4, "big") + encrypted_payload)
         
-        # server should send back path_hashes for us to update root_hash
+        # we receive path_hashes for us to update our root_hash
         return_message = self.s.recv(128) 
-        print("hi", return_message)
+        print("return message:", return_message)
         path_hashes = [return_message[i:i+32] for i in range(0, len(return_message), 32)] # consists of bytes
-
-        old_file = self.get(password, file_id)
-        new_hash = verify_update(file_id, path_hashes, self.root_hash, old_file, encrypted_payload, self.n) 
+        print("length of path hashes", len(path_hashes), "length of one hash", len(path_hashes[0]))
+        print("path hashes", path_hashes)
+        
+        new_hash = verify_update(file_id, path_hashes, self.root_hash, encrypted_old_file, encrypted_payload, self.n) 
         if new_hash == False:
-            print("error")
             return False
         else: 
             self.root_hash = new_hash
@@ -52,18 +61,27 @@ class Client:
 # file id can be 0-7 bc of merkle conditions (rn)
 if __name__ == "__main__":
     #password = "ilikerats"
-    #message = b"rats like cheese"
+    message1 = b"rats like cheese"
 
     password = "ilikeicecream"
-    message = b"sofie wants to be an icecream"
+    message2 = b"sofie wants to be an icecream"
 
     c = Client()
     
     print("Putting data...")
-    if not c.put(password, 0, message): 
+    if not c.put(password, 0, message1): 
         print("Error: update error")
+        exit(0)
+    returned_message = c.get(password, 0)
+    if returned_message == message1:
+        print("Success! Retrieved matches original.")
+
+    if not c.put(password, 0, message2): 
+        print("Error: update error")
+        exit(0)
+    returned_message = c.get(password, 0)
+    if returned_message == message2:
+        print("Success! Retrieved matches original.")
+    
     
 
-    returned_message = c.get(password, 0)
-    if returned_message == message:
-        print("Success! Retrieved matches original.")

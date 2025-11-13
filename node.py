@@ -25,7 +25,6 @@ class Node:
 
     def update_leaf(self, file_id, new_file: bytes, path_hashes): # leaf nodes are files
         if self.is_leaf:
-            print("NEW_FILE", new_file, len(new_file))
             self.hash = self.compute_hash(new_file)
             return
         
@@ -44,6 +43,7 @@ class Node:
             self.right_child.update_leaf(file_id, new_file, path_hashes)
         
         self.hash = self.compute_hash(self.left_child.hash + self.right_child.hash)
+        print("hash", self.depth, self.hash)
 
 
 

@@ -13,9 +13,11 @@ def reconstruct_root_hash(L, R, file_id, depth, path_hashes, leaf_hash):
     hash = ""
     if file_id <= mid:
         hash = reconstruct_root_hash(L, mid, file_id, depth+1, path_hashes, leaf_hash)
+        print(depth, hash)
         return compute_hash(hash + path_hashes[depth])
     else:
         hash = reconstruct_root_hash(mid+1, R, file_id, depth+1, path_hashes, leaf_hash)
+        print(depth, hash)
         return compute_hash(path_hashes[depth] + hash)
 
 
@@ -28,10 +30,14 @@ def verify_update(file_id, path_hashes, old_root_hash, old_file: bytes, new_file
     old_file_hash = compute_hash(old_file)
     new_file_hash = compute_hash(new_file)
 
-    # recursively walk down in binary tree to verify old root-hash with complemented path nodes
-    computed_old_root_hash = reconstruct_root_hash(0, n-1, file_id, 0, path_hashes, old_file_hash)
-    if computed_old_root_hash != old_root_hash:
-        return False # verification failes
+    # verify path_hashes by comparing old file resulted root hash with our stored root hash
+        
+    if old_root_hash != b"":
+        computed_old_root_hash = reconstruct_root_hash(0, n-1, file_id, 0, path_hashes, old_file_hash)
+        print("compued old root hash", computed_old_root_hash)
+        print("old root hash", old_root_hash)
+        if computed_old_root_hash != old_root_hash:
+            return False # verification failes
 
     # verify new root hash 
     computed_new_root_hash = reconstruct_root_hash(0, n-1, file_id, 0, path_hashes, new_file_hash)
