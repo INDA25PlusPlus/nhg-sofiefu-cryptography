@@ -1,4 +1,4 @@
-# the server saves the whole merkle tree whilst client save a constant (root hash)
+# for server: when received verify_update from client, run this function
 
 
 def update_file(file_id, new_hash): # updates file and sends back nodes along the path to this leaf-node
@@ -7,3 +7,4 @@ def update_file(file_id, new_hash): # updates file and sends back nodes along th
 
 
     # send path_nodes to client
+    return path_nodes
