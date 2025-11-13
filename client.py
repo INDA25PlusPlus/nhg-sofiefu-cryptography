@@ -1,6 +1,6 @@
 import socket
 import client_help
-from verify_update import update_root_hash, verify_root_hash
+from verify_update import verify_update
 
 class Client:
 
@@ -20,16 +20,18 @@ class Client:
         self.s.sendall(header + len(encrypted_payload).to_bytes(4, "big") + encrypted_payload)
         
         # server should send back path_hashes for us to update root_hash
-        path_hashes = self.s.recv() # todo: should i put anything inside recv()
+        return_message = self.s.recv() 
+        path_hashes = [return_message[i:i+32] for i in range(0, len(return_message), 32)] # consists of bytes
 
-        new_hash = verify_update(file_id, path_hashes) 
+        old_file = self.get(file_id)
+        new_hash = verify_update(file_id, path_hashes, self.root_hash, old_file, data, self.n) 
         if new_hash == False:
-            print("Error")
-            exit(0) # or whatever else we want to do
+            print("error")
+            return False
         else: 
             self.root_hash = new_hash
             
-        return self.s.recv(2) == b"OK"
+        return True
     
     def get(self, file_id):
         """

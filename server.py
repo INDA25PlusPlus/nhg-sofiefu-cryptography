@@ -1,5 +1,6 @@
 import socket
 import threading
+from node import update_leaf
 
 store = {}  # file_id -> data (bytes)
 
@@ -17,7 +18,17 @@ def handle_client(conn):
                 blob = recv_all(conn, size)
                 print("SERVER got blob len:", len(blob))
                 store[file_id] = blob
-                conn.sendall(b"OK")
+                
+                path_hashes = []
+                path_hashes.append(root_node.hash)
+                root_node.update_leaf(file_id, blob, path_hashes)
+                print("number of bytes of one hash:", len(path_hashes[0])) # check if its 32 byte
+
+                return_message = b""
+                for hash in path_hashes:
+                    return_message.append(hash)
+
+                conn.sendall(return_message)
 
             elif op == 2:  # GET
                 data = store.get(file_id, None)

@@ -20,12 +20,12 @@ class Node:
         left_child = None 
         right_child = None
 
-    def compute_hash(data):
-        hashlib.sha256(data).hexdigest()
+    def compute_hash(data: bytes):
+        return hashlib.sha256(data).digest() # takes bytes and returns 32 bytes
 
-    def update_leaf(self, file_id, new_hash, path_nodes): # leaf nodes are files
+    def update_leaf(self, file_id, new_file, path_hashes): # leaf nodes are files
         if self.is_leaf:
-            self.hash = new_hash
+            self.hash = self.compute_hash(new_file)
             return
         
         mid = (self.L+self.R)//2
@@ -36,11 +36,11 @@ class Node:
 
         # recurse to lower level
         if file_id <= mid:
-            path_nodes.append(self.right_child.hash)
-            self.left_child.update_leaf(file_id, new_hash, path_nodes)
+            path_hashes.append(self.right_child.hash)
+            self.left_child.update_leaf(file_id, new_file, path_hashes)
         else:
-            path_nodes.append(self.left_child.hash)
-            self.right_child.update_leaf(file_id, new_hash, path_nodes)
+            path_hashes.append(self.left_child.hash)
+            self.right_child.update_leaf(file_id, new_file, path_hashes)
         
         self.hash = self.compute_hash(self.left_child.hash + self.right_child.hash)
 
