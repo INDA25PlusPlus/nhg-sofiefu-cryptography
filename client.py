@@ -14,19 +14,19 @@ class Client:
         """
         Sends encrypted and signed data to server. Returns True on success.
         """
-        header = bytes([1]) + file_id.to_bytes(3, "big")  # 1=put, 2=get
-        encrypted_payload = client_help.encrypt_data(password, file_id, data)
-
         # get old file to verify update
         old_file = self.get(password, file_id)
         if old_file == None:
             encrypted_old_file = b""
         else:
             encrypted_old_file = client_help.encrypt_data(password, file_id, old_file)
-        print("encypted_old_file", encrypted_old_file, len(encrypted_old_file))
+        print("ENCRYPTED OLD FILE", encrypted_old_file, len(encrypted_old_file))
 
-        # send file to server to update 
+        # update file
+        header = bytes([1]) + file_id.to_bytes(3, "big")  # 1=put, 2=get
+        encrypted_payload = client_help.encrypt_data(password, file_id, data)
         self.s.sendall(header + len(encrypted_payload).to_bytes(4, "big") + encrypted_payload)
+        print("ENCRYPTED PAYLOAD", encrypted_payload)
         
         # we receive path_hashes for us to update our root_hash
         return_message = self.s.recv(128) 

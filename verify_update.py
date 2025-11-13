@@ -7,18 +7,20 @@ def compute_hash(data: bytes):
 
 def reconstruct_root_hash(L, R, file_id, depth, path_hashes, leaf_hash):
     if L==R:
+        print("LEAF HASH", leaf_hash)
         return leaf_hash
     
     mid = (L+R)//2
-    hash = ""
     if file_id <= mid:
-        hash = reconstruct_root_hash(L, mid, file_id, depth+1, path_hashes, leaf_hash)
-        print(depth, hash)
-        return compute_hash(hash + path_hashes[depth])
+        left_hash = reconstruct_root_hash(L, mid, file_id, depth+1, path_hashes, leaf_hash)
+        right_hash = path_hashes[depth+1]
     else:
-        hash = reconstruct_root_hash(mid+1, R, file_id, depth+1, path_hashes, leaf_hash)
-        print(depth, hash)
-        return compute_hash(path_hashes[depth] + hash)
+        right_hash = reconstruct_root_hash(mid+1, R, file_id, depth+1, path_hashes, leaf_hash)
+        left_hash = path_hashes[depth+1]
+
+    hash = compute_hash(left_hash+right_hash)
+    print("PATH HASH", depth, hash)
+    return hash
 
 
 def verify_update(file_id, path_hashes, old_root_hash, old_file: bytes, new_file: bytes, n): 
@@ -34,8 +36,8 @@ def verify_update(file_id, path_hashes, old_root_hash, old_file: bytes, new_file
         
     if old_root_hash != b"":
         computed_old_root_hash = reconstruct_root_hash(0, n-1, file_id, 0, path_hashes, old_file_hash)
-        print("compued old root hash", computed_old_root_hash)
-        print("old root hash", old_root_hash)
+        print("COMPUTED old root hash", computed_old_root_hash)
+        print("OLD root hash", old_root_hash)
         if computed_old_root_hash != old_root_hash:
             return False # verification failes
 

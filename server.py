@@ -20,12 +20,11 @@ def handle_client(conn, root_node: Node):
                 store[file_id] = blob
 
                 encrypted_file = blob
-                print("Encrypted file:", encrypted_file, len(encrypted_file))
+                print("ENCRYPTED FILE:", encrypted_file, len(encrypted_file))
                 
                 path_hashes = []
                 root_node.update_leaf(file_id, encrypted_file, path_hashes)
                 path_hashes.insert(0, root_node.hash)
-                print("number of bytes of one hash:", len(path_hashes[0])) # check if its 32 byte
 
                 return_message = b""
                 for hash in path_hashes:
