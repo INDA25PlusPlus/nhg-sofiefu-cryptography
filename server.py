@@ -19,7 +19,8 @@ def handle_client(conn, root_node: Node):
                 print("SERVER got blob len:", len(blob))
                 store[file_id] = blob
 
-                encrypted_file = blob[3:]
+                encrypted_file = blob
+                print("Encrypted file:", len(encrypted_file))
                 
                 path_hashes = []
                 path_hashes.append(root_node.hash)
