@@ -19,7 +19,7 @@ class Client:
         if old_raw_blob is None:
             encrypted_old_file = b""
         else:
-            encrypted_old_file = old_raw_blob
+            encrypted_old_file = old_raw_blob   # <--- use server's exact bytes
         print("ENCRYPTED OLD FILE", encrypted_old_file, len(encrypted_old_file))
 
         # update file
@@ -61,28 +61,33 @@ class Client:
 
 # file id can be 0-7 bc of merkle conditions (rn)
 if __name__ == "__main__":
-    #password = "ilikerats"
-    message1 = b"rats like cheese"
-
     password = "ilikeicecream"
+    message1 = b"rats like cheese"
     message2 = b"sofie wants to be an icecream"
 
     c = Client()
-    
-    print("Putting data...")
-    if not c.put(password, 0, message1): 
-        print("Error: update error")
-        exit(0)
-    returned_message = c.get(password, 0)
-    if returned_message == message1:
-        print("Success! Retrieved matches original.")
 
-    if not c.put(password, 0, message2): 
-        print("Error: update error")
+    print("\n=== FIRST PUT ===")
+    if not c.put(password, 0, message1):
+        print("[FAIL] First PUT failed.")
         exit(0)
-    returned_message = c.get(password, 0)
+
+    returned_message, _ = c.get(password, 0)
+    if returned_message == message1:
+        print("[OK] Success! Retrieved matches original.")
+    else:
+        print("[ERR] Retrieved data mismatch after first PUT.")
+
+    print("\n=== SECOND PUT ===")
+    if not c.put(password, 0, message2):
+        print("[FAIL] Second PUT failed.")
+        exit(0)
+
+    returned_message, _ = c.get(password, 0)
     if returned_message == message2:
-        print("Success! Retrieved matches original.")
+        print("[OK] Success! Retrieved matches original.")
+    else:
+        print("[ERR] Retrieved data mismatch after second PUT.")
     
     
 

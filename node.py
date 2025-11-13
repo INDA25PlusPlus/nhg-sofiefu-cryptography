@@ -6,7 +6,7 @@ import hashlib
 class Node:
     # n=number of leaf nodes
     n = 8
-    tree_depth = math.log2(n) # depth(root_node) = 0
+    tree_depth = int(math.log2(n)) # depth(root_node) = 0
     
     def __init__(self, depth, L, R): 
         self.depth = depth
@@ -23,28 +23,29 @@ class Node:
     def compute_hash(self, data: bytes):
         return hashlib.sha256(data).digest() # takes bytes and returns 32 bytes
 
-    def update_leaf(self, file_id, new_file: bytes, path_hashes): # leaf nodes are files
-        if self.is_leaf:
-            self.hash = self.compute_hash(new_file)
-            print("SELF HASH", self.hash)
+    def update_leaf(self, file_id, encrypted_file, path_hashes): # leaf nodes are files
+        if self.left is None and self.right is None:
+            # leaf node
+            if self.file_id == file_id:
+                self.hash = sha256(encrypted_file)
+            # return path
             return
-        
-        mid = (self.L+self.R)//2
-        if self.left_child == None:
-            self.left_child = Node(self.depth+1, self.L, mid)
-        if self.right_child == None:
-            self.right_child = Node(self.depth+1, mid+1, self.R)
-
-        # recurse to lower level
+        # descend
+        mid = (self.start + self.end) // 2
         if file_id <= mid:
-            path_hashes.append(self.right_child.hash)
-            self.left_child.update_leaf(file_id, new_file, path_hashes)
+            self.left.update_leaf(file_id, encrypted_file, path_hashes)
+            direction = "R"
+            sibling_hash = self.right.hash
         else:
-            path_hashes.append(self.left_child.hash)
-            self.right_child.update_leaf(file_id, new_file, path_hashes)
-        
-        self.hash = self.compute_hash(self.left_child.hash + self.right_child.hash)
-        print("HASH IN MERKLE PATH", self.depth, self.hash)
+            self.right.update_leaf(file_id, encrypted_file, path_hashes)
+            direction = "L"
+            sibling_hash = self.left.hash
+
+        # record sibling and direction for verification later
+        path_hashes.append((sibling_hash, direction))
+
+        # recompute current node hash
+        self.hash = sha256(self.left.hash + self.right.hash)
 
 
 
