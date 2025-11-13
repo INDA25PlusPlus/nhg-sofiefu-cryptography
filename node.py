@@ -20,11 +20,12 @@ class Node:
         self.left_child = None 
         self.right_child = None
 
-    def compute_hash(data: bytes):
+    def compute_hash(self, data: bytes):
         return hashlib.sha256(data).digest() # takes bytes and returns 32 bytes
 
     def update_leaf(self, file_id, new_file: bytes, path_hashes): # leaf nodes are files
         if self.is_leaf:
+            print("NEW_FILE", new_file, len(new_file))
             self.hash = self.compute_hash(new_file)
             return
         
