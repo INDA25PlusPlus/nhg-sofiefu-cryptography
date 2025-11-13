@@ -54,10 +54,16 @@ if __name__ == "__main__":
     password = "ilikerats"
     message = b"rats like cheese"
 
+    password = "ilikeicecream"
+    message = b"sofie wants to be an icecream"
+
     c = Client()
     
     print("Putting data...")
-    c.put(password, 1, message)
+    if not c.put(password, 0, message): 
+        print("Error: update error")
+    
+
     returned_message = c.get(1)
     if returned_message == message:
         print("Success! Retrieved matches original.")
