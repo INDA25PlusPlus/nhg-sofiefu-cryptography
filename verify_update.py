@@ -12,10 +12,10 @@ def reconstruct_root_hash(L, R, file_id, depth, path_hashes, leaf_hash):
     mid = (L+R)//2
     hash = ""
     if file_id <= mid:
-        hash = reconstruct_root_hash(L, mid, file_id, path_hashes, leaf_hash)
+        hash = reconstruct_root_hash(L, mid, file_id, depth+1, path_hashes, leaf_hash)
         return compute_hash(hash + path_hashes[depth])
     else:
-        hash = reconstruct_root_hash(mid+1, R, file_id, path_hashes, leaf_hash)
+        hash = reconstruct_root_hash(mid+1, R, file_id, depth+1, path_hashes, leaf_hash)
         return compute_hash(path_hashes[depth] + hash)
 
 
