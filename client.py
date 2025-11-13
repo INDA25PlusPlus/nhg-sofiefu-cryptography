@@ -24,7 +24,7 @@ class Client:
         print("hi", return_message)
         path_hashes = [return_message[i:i+32] for i in range(0, len(return_message), 32)] # consists of bytes
 
-        old_file = self.get(file_id)
+        old_file = self.get(password, file_id)
         new_hash = verify_update(file_id, path_hashes, self.root_hash, old_file, encrypted_payload, self.n) 
         if new_hash == False:
             print("error")
@@ -34,7 +34,7 @@ class Client:
             
         return True
     
-    def get(self, file_id):
+    def get(self, password, file_id):
         """
         Retrieves encrypted data from server by file_id.
         Returns decrypted data bytes on success, or None if not found.
@@ -47,12 +47,12 @@ class Client:
         size = int.from_bytes(self.s.recv(4), "big")
         blob = self.s.recv(size)
         print("GET blob len:", len(blob))
-        return client_help.decrypt_data("ilikerats", file_id, blob)
+        return client_help.decrypt_data(password, file_id, blob)
 
 # file id can be 0-7 bc of merkle conditions (rn)
 if __name__ == "__main__":
-    password = "ilikerats"
-    message = b"rats like cheese"
+    #password = "ilikerats"
+    #message = b"rats like cheese"
 
     password = "ilikeicecream"
     message = b"sofie wants to be an icecream"
@@ -64,6 +64,6 @@ if __name__ == "__main__":
         print("Error: update error")
     
 
-    returned_message = c.get(1)
+    returned_message = c.get(password, 0)
     if returned_message == message:
         print("Success! Retrieved matches original.")
