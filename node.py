@@ -23,7 +23,7 @@ class Node:
     def compute_hash(data: bytes):
         return hashlib.sha256(data).digest() # takes bytes and returns 32 bytes
 
-    def update_leaf(self, file_id, new_file, path_hashes): # leaf nodes are files
+    def update_leaf(self, file_id, new_file: bytes, path_hashes): # leaf nodes are files
         if self.is_leaf:
             self.hash = self.compute_hash(new_file)
             return

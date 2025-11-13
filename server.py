@@ -18,10 +18,12 @@ def handle_client(conn):
                 blob = recv_all(conn, size)
                 print("SERVER got blob len:", len(blob))
                 store[file_id] = blob
+
+                encrypted_file = blob[3:]
                 
                 path_hashes = []
                 path_hashes.append(root_node.hash)
-                root_node.update_leaf(file_id, blob, path_hashes)
+                root_node.update_leaf(file_id, encrypted_file, path_hashes)
                 print("number of bytes of one hash:", len(path_hashes[0])) # check if its 32 byte
 
                 return_message = b""
