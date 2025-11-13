@@ -28,7 +28,7 @@ def handle_client(conn, root_node: Node):
 
                 return_message = b""
                 for hash in path_hashes:
-                    return_message.append(hash)
+                    return_message += hash
 
                 conn.sendall(return_message)
 
