@@ -16,9 +16,9 @@ class Node:
         self.L = L 
         self.R = R
 
-        hash = bytes(32)
-        left_child = None 
-        right_child = None
+        self.hash = bytes(32)
+        self.left_child = None 
+        self.right_child = None
 
     def compute_hash(data: bytes):
         return hashlib.sha256(data).digest() # takes bytes and returns 32 bytes
