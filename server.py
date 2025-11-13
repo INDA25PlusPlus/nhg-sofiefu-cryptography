@@ -1,10 +1,10 @@
 import socket
 import threading
-from node import update_leaf
+from node import Node
 
 store = {}  # file_id -> data (bytes)
 
-def handle_client(conn):
+def handle_client(conn, root_node: Node):
     try:
         while True:
             header = conn.recv(4)
@@ -61,9 +61,12 @@ def main():
     s.listen()
     print("Server listening on port 9000")
 
+    n = 8 # fixed
+    root_node = Node(0, 0, n-1) # create root node of merkle tree 
+
     while True:
         conn, _ = s.accept()
-        threading.Thread(target=handle_client, args=(conn,), daemon=True).start()
+        threading.Thread(target=handle_client, args=(conn, root_node), daemon=True).start()
 
 if __name__ == "__main__":
     main()

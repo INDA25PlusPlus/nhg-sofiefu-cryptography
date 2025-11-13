@@ -1,4 +1,4 @@
-# for client: to verify that files is correctly updated
+# for client: to verify that a file is correctly updated
 # run verify_update right after file update 
 import hashlib
 
