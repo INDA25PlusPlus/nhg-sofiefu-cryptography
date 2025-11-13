@@ -73,14 +73,14 @@ if __name__ == "__main__":
     if not c.put(password, 0, message1): 
         print("Error: update error")
         exit(0)
-    returned_message = c.get(password, 0)
+    returned_message, _ = c.get(password, 0)
     if returned_message == message1:
         print("Success! Retrieved matches original.")
 
     if not c.put(password, 0, message2): 
         print("Error: update error")
         exit(0)
-    returned_message = c.get(password, 0)
+    returned_message, _ = c.get(password, 0)
     if returned_message == message2:
         print("Success! Retrieved matches original.")
     
