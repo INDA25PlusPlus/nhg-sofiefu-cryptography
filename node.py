@@ -16,7 +16,7 @@ class Node:
         self.L = L 
         self.R = R
 
-        hash = ""
+        hash = bytes(32)
         left_child = None 
         right_child = None
 
